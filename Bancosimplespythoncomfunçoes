@@ -1,0 +1,119 @@
+menu = """
+[1] Depositar
+[2] Sacar
+[3] Extrato
+[5] Criar Usuario
+[6] Criar Conta Corrente
+[7] Verificar Dono da Conta
+[4] Sair
+
+"""
+
+saldo = 0
+limite = 0
+extratodeposito = []
+extratosaque = []
+numero_saques = 0
+LIMITE_SAQUES = 3
+contador = 0
+dados_usuarios = {}
+dados_usuarios_verifica = {}
+dados_conta_corrente = {}
+cont_usuario = 0
+cont_conta = 1
+
+def Deposito(limite,saldo,/):
+    saldo += limite
+    return float(saldo)
+
+def Saque(*,limite,saldo,extratosaque,contador):
+    if limite > 500:
+        print("Limite de R$ 500,00 por saque ultrapassado.")
+    elif int(limite) > saldo:
+        print("Saldo Insuficiente.")
+    else:
+        saldo -= limite
+        return float(saldo)
+    
+def Extrato(extratodeposito,/,*,extratosaque,saldo):
+    print("Depositos:")
+    for i in extratodeposito:
+        print("R$",i)
+    print("Saques:")
+    for i in extratosaque:
+        print("R$",i)
+    saldo = float(saldo)
+    saldo = ("{:.2f}".format(saldo))
+    print("Saldo atual:",saldo)
+
+def CriarUsuario(dados_usuarios,cont_usuario):
+    verifica = 0
+    numero_usuario = cont_usuario
+    dados_usuarios_verifica.update({numero_usuario :{"nome":input("Digite seu nome:"),"data_nascimento":input("Digite sua data de nascimento:"),"endereco":input("Digite seu endereco:"),"cpf":input("Digite seu CPF:")}})
+    while verifica < cont_usuario:
+        if dados_usuarios.get(verifica).get("cpf") == dados_usuarios_verifica.get(numero_usuario).get("cpf"):
+            print("CPF ja cadastrado!")
+            return dados_usuarios
+        verifica = verifica + 1
+    print("Usuario criado com sucesso! O seu número de usuario é",numero_usuario)
+    return dados_usuarios_verifica
+
+def CriarContaCorrente(dados_conta_corrente,cont_conta):
+    numero_conta = cont_conta
+    dados_conta_corrente.update({numero_conta :{"numero_da_agencia":"0001","numero_usuario":input("Digite o seu numero de usuario:")}})
+    print("Parabens sua conta foi criada com sucesso! O número de sua conta é",numero_conta)
+    return dados_conta_corrente
+
+
+def VerificaDonoDaconta(dados_conta_corrente,cont_conta):
+    verifica_conta = input("Digite o número de usuario para ver suas contas vinculadas:")
+    cont = 1
+    while cont < cont_conta :
+        if verifica_conta == dados_conta_corrente.get(cont).get("numero_usuario"):
+            print("Essa conta esta vinculade a este número de usuario:",dados_conta_corrente.get(cont))
+        cont = cont + 1
+    return
+
+while True:
+    opcao = str(input(menu))
+
+    if opcao == "1":
+        limite = float(input("Digite o valor desejado para depositar:"))
+        if limite < 0:
+            break
+        saldo = Deposito(limite,saldo)
+        extratodeposito.append ("{:.2f}".format(limite))
+        contador += 1
+        limite = 0
+
+    elif opcao == "2":
+        if numero_saques == LIMITE_SAQUES:
+            print("Limite de saques diarios alcançado.") 
+        else:
+            limite = float(input("Digite o valor desejado para sacar:"))
+            saldo = Saque(limite = limite ,saldo = saldo,extratosaque = extratosaque,contador = contador)
+            numero_saques += 1
+            extratosaque.append ("{:.2f}".format(limite))
+            contador += 1
+            limite = 0
+
+    elif opcao == "3":
+        Extrato(extratodeposito,extratosaque = extratosaque,saldo = saldo)
+
+    elif opcao == "4":
+        break
+    
+    elif opcao == "5":
+        dados_usuarios = CriarUsuario(dados_usuarios,cont_usuario).copy()
+        cont_usuario = cont_usuario + 1
+
+    elif opcao == "6":
+        dados_conta_corrente = CriarContaCorrente(dados_conta_corrente,cont_conta).copy()
+        cont_conta = cont_conta + 1
+
+    elif opcao == "7":
+        VerificaDonoDaconta(dados_conta_corrente,cont_conta)
+
+
+    else:
+        print("Selecione uma opção valida.")
